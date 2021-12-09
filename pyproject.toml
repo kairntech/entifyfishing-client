@@ -12,16 +12,17 @@ packages = [
 include = ["CHANGELOG.md", "entifyfishing_client/py.typed"]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 httpx = ">=0.15.4,<0.21.0"
 attrs = ">=20.1.0,<22.0.0"
 python-dateutil = "^2.8.0"
-typing_extensions = "^4.0.1"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
-black = {version = "^21.11b1", allow-prereleases = true}
+typing-extensions = "^4.0.1"
+black = "^21.12b0"
 
 [build-system]
 requires = ["poetry>=1.0"]
@@ -29,7 +30,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.black]
 line-length = 120
-target_version = ['py36', 'py37', 'py38']
+target_version = ['py37', 'py38']
 exclude = '''
 (
   /(
