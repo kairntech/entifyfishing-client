@@ -1,5 +1,5 @@
 # entifyfishing-client
-A client library for accessing Entity-fishing - Entity Recognition and Disambiguation
+A client library for accessing [Entity-fishing](https://github.com/kermitt2/entity-fishing) - Entity Recognition and Disambiguation
 
 ## Usage
 First, create a client:
