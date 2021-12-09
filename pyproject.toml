@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "entifyfishing-client"
+version = "0.4.0"
+description = "A client library for accessing Entity-fishing - Entity Recognition and Disambiguation"
+
+authors = []
+
+readme = "README.md"
+packages = [
+    {include = "entifyfishing_client"},
+]
+include = ["CHANGELOG.md", "entifyfishing_client/py.typed"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+httpx = ">=0.15.4,<0.21.0"
+# httpx = "==0.18.2"
+attrs = ">=20.1.0,<22.0.0"
+python-dateutil = "^2.8.0"
+
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
+
+[tool.black]
+line-length = 120
+target_version = ['py36', 'py37', 'py38']
+exclude = '''
+(
+  /(
+    | \.git
+    | \.venv
+    | \.mypy_cache
+  )/
+)
+'''
+
+[tool.isort]
+line_length = 120
+profile = "black"
