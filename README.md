@@ -7,46 +7,88 @@ First, create a client:
 ```python
 from entifyfishing_client import Client
 
-client = Client(base_url="https://api.example.com")
-```
-
-If the endpoints you're going to hit require authentication, use `AuthenticatedClient` instead:
-
-```python
-from entifyfishing_client import AuthenticatedClient
-
-client = AuthenticatedClient(base_url="https://api.example.com", token="SuperSecretToken")
+client = Client(base_url="http://nerd.huma-num.fr/nerd/service")
 ```
 
 Now call your endpoint and use your models:
 
 ```python
-from entifyfishing_client.models import MyDataModel
-from entifyfishing_client.api.my_tag import get_my_data_model
-from entifyfishing_client.types import Response
+from entifyfishing_client.api.knowledge_base import get_concept, term_lookup
+from entifyfishing_client.api.query_processing import disambiguate
+from entifyfishing_client.models import (
+    Concept,
+    DisambiguateForm,
+    Language,
+    QueryParameters,
+    QueryResultFile,
+    QueryResultTermVector,
+    QueryResultText,
+    TermSenses,
+)
+from entifyfishing_client.types import File
 
-my_data: MyDataModel = get_my_data_model.sync(client=client)
-# or if you need more info (e.g. status_code)
-response: Response[MyDataModel] = get_my_data_model.sync_detailed(client=client)
+form = DisambiguateForm(
+    query=QueryParameters(
+        text="""Austria invaded and fought the Serbian army at the Battle of Cer and Battle of Kolubara beginning on 12 August. 
+            The army, led by general Paul von Hindenburg defeated Russia in a series of battles collectively known as the First Battle of Tannenberg (17 August – 2 September). 
+            But the failed Russian invasion, causing the fresh German troops to move to the east, allowed the tactical Allied victory at the First Battle of the Marne. 
+            Unfortunately for the Allies, the pro-German King Constantine I dismissed the pro-Allied government of E. Venizelos before the Allied expeditionary force could arrive.
+            """,
+        language=Language(lang="en"),
+        mentions=["ner", "wikipedia"],
+        nbest=False,
+        customisation="generic",
+        min_selector_score=0.2,
+    )
+)
+r = disambiguate.sync_detailed(client=client, multipart_data=form)
+if r.is_success:
+    result: QueryResultText = r.parsed
+    assert result is not None
+    assert len(result.entities) > 0
+    assert result.entities[0].raw_name == "Austria"
+    assert result.entities[0].wikidata_id == "Q40"
+    
+r = get_concept.sync_detailed(id="Q40", client=client)
+result: Concept = r.parsed
+if r.is_success:
+    assert result is not None
+    assert result.raw_name == "Austria"
+    assert result.wikidata_id == "Q40"    
+    assert len(result.statements) > 0
 ```
 
 Or do the same thing with an async version:
 
 ```python
-from entifyfishing_client.models import MyDataModel
-from entifyfishing_client.api.my_tag import get_my_data_model
-from entifyfishing_client.types import Response
-
-my_data: MyDataModel = await get_my_data_model.asyncio(client=client)
-response: Response[MyDataModel] = await get_my_data_model.asyncio_detailed(client=client)
+pdf_file = "MyPDFFile.pdf"
+with pdf_file.open("rb") as fin:
+    form = DisambiguateForm(
+        query=QueryParameters(
+            language=Language(lang="en"),
+            mentions=["wikipedia"],
+            nbest=False,
+            customisation="generic",
+            min_selector_score=0.2,
+            sentence=True,
+            structure="grobid",
+        ),
+        file=File(file_name=pdf_file.name, payload=fin, mime_type="application/pdf"),
+    )
+    r = await disambiguate.asyncio_detailed(client=client, multipart_data=form)
+    if r.is_success:
+        result: QueryResultFile = r.parsed
+        assert result is not None
+        assert len(result.entities) > 0
+        assert len(result.pages) > 0
+        assert len(result.entities[0].pos) > 0
 ```
 
 By default, when you're calling an HTTPS API it will attempt to verify that SSL is working correctly. Using certificate verification is highly recommended most of the time, but sometimes you may need to authenticate to a server (especially an internal server) using a custom certificate bundle.
 
 ```python
-client = AuthenticatedClient(
-    base_url="https://internal_api.example.com", 
-    token="SuperSecretToken",
+client = Client(
+    base_url="http://nerd.huma-num.fr/nerd/service", 
     verify_ssl="/path/to/certificate_bundle.pem",
 )
 ```
@@ -54,9 +96,7 @@ client = AuthenticatedClient(
 You can also disable certificate validation altogether, but beware that **this is a security risk**.
 
 ```python
-client = AuthenticatedClient(
-    base_url="https://internal_api.example.com", 
-    token="SuperSecretToken", 
+client = Client(
     verify_ssl=False
 )
 ```
