@@ -171,7 +171,7 @@ python-versions = ">=3.6"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "a1113f508c312aa2e0657c6e7c761dd5d3875ea8122712e51c845ad46a94f2d8"
+content-hash = "3cde239797369cb9ef22658e843bdad6ae96aac7e1646fa8f45468e8a272a300"
 
 [metadata.files]
 async-generator = [

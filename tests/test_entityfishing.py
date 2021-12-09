@@ -15,32 +15,20 @@ from entifyfishing_client.models import (
     QueryResultTermVector,
     QueryResultText,
     TermSenses,
+    WeightedTerm,
 )
 from entifyfishing_client.types import File
 
 
 def test_disambiguate_text():
-    client = Client(base_url="https://entityfishing.kairntech.com/service", timeout=300)
+    client = Client(base_url="http://nerd.huma-num.fr/nerd//service", timeout=300)
     form = DisambiguateForm(
         query=QueryParameters(
-            text="""Ursula von der Leyen on mission to win over MEPs in Strasbourg. 
-        Surprise choice to lead European commission criticised by Socialists and Greens. 
-        Ursula von der Leyen, the nominee to lead the European commission, will seek to build bridges with members of the European parliament in Strasbourg after a mixed reaction to her historic appointment. 
-        Germany’s defence minister was a surprise choice to lead the commission, as EU leaders struggled to reach a compromise during three days of summit talks dedicated to finding people to lead the EU’s most important institutions. Von der Leyen needs to win support from a majority of members of the European parliament in order to take over the reins from Jean-Claude Juncker on 1 November. 
-        She is due to meet MEPs in Strasbourg on Wednesday. 
-        The 60-year-old former gynaecologist, who speaks fluent English and French and studied at the London School of Economics, would be the first woman to lead the EU executive in its 62-year history. 
-        While she has won plaudits for her wide-ranging experience, her appointment has been heavily criticised by Socialist and Green MEPs. 
-        The election of the Socialists’ candidate, the Italian MEP David-Maria Sassoli, as European parliament president for a two-and-a-half-year term, came as a consolation. 
-        He won a narrow majority, prevailing over a Czech Eurosceptic, the Greens and the radical left, after two rounds of voting. 
-        In his victory speech, Sassoli paid tribute to British MEPs and described Brexit as “painful“. 
-        He said: “With all due respect for the choices made by British citizens, this is a political transition that has to be pursued in a reasonable way in a spirit of dialogue.“ Despite this gain for the left, Socialist members of the European parliament were still smarting that EU leaders had rejected their candidate, Frans Timmermans, the first vice-president of the European commission. 
-        His appointment had been fiercely opposed by Poland and Hungary, two governments that are embroiled in a dispute with the EU over violations of the rule of law. 
-        Timmermans has been leading talks with Warsaw and Budapest on behalf of the EU, a difficult job that has made him the target of hostile coverage in the state-dominated media in those countries. 
-        Hungarian government spokesman Zoltán Kovács said the “Visegrád Four“, which also includes Slovakia and the Czech Republic, had demonstrated their growing strength and influence over the direction of the EU, in part, because they had “toppled Timmermans“. 
-        Kovács also boasted of the defeat of Manfred Weber, the centre-right candidate to become European commission president, who was the first choice of the German chancellor, Angela Merkel. 
-        Socialist MEPs meeting in Strasbourg on Tuesday reacted with fury when reports emerged of the Von der Leyen compromise, largely because of the defeat for their candidate who has been the EU flag-bearer for the rule of law. 
-        “It is unacceptable that populist governments represented in the council rule out the best candidate only because he has stood up for the rule of law and for our shared European values,“ said the Socialist MEP leader, Iratxe García. 
-        """,
+            text="""Austria invaded and fought the Serbian army at the Battle of Cer and Battle of Kolubara beginning on 12 August. 
+            The army, led by general Paul von Hindenburg defeated Russia in a series of battles collectively known as the First Battle of Tannenberg (17 August – 2 September). 
+            But the failed Russian invasion, causing the fresh German troops to move to the east, allowed the tactical Allied victory at the First Battle of the Marne. 
+            Unfortunately for the Allies, the pro-German King Constantine I dismissed the pro-Allied government of E. Venizelos before the Allied expeditionary force could arrive.
+            """,
             language=Language(lang="en"),
             mentions=["ner", "wikipedia"],
             nbest=False,
@@ -53,8 +41,8 @@ def test_disambiguate_text():
         result: QueryResultText = r.parsed
         assert result is not None
         assert len(result.entities) > 0
-        assert result.entities[0].raw_name == "Ursula von der Leyen"
-        assert result.entities[0].wikidata_id == "Q60772"
+        assert result.entities[0].raw_name == "Austria"
+        assert result.entities[0].wikidata_id == "Q40"
 
 
 def test_disambiguate_pdf():
@@ -62,7 +50,7 @@ def test_disambiguate_pdf():
     # json_file = testdir / "scai_test_sherpa.json"
     pdf_file = testdir / "PMC1636350.pdf"
     with pdf_file.open("rb") as fin:
-        client = Client(base_url="https://entityfishing.kairntech.com/service", timeout=300)
+        client = Client(base_url="http://nerd.huma-num.fr/nerd//service", timeout=300)
         form = DisambiguateForm(
             query=QueryParameters(
                 language=Language(lang="en"),
@@ -85,10 +73,10 @@ def test_disambiguate_pdf():
 
 
 def test_disambiguate_vector():
-    client = Client(base_url="https://entityfishing.kairntech.com/service", timeout=300)
+    client = Client(base_url="http://nerd.huma-num.fr/nerd//service", timeout=300)
     form = DisambiguateForm(
         query=QueryParameters(
-            #            term_vector=[WeightedTerm(term="Jaguar", score=1.0), WeightedTerm(term="car", score=1.0)],
+            term_vector=[WeightedTerm(term="Jaguar", score=1.0), WeightedTerm(term="car", score=1.0)],
             language=Language(lang="en"),
             mentions=["wikipedia"],
             nbest=False,
@@ -106,7 +94,7 @@ def test_disambiguate_vector():
 
 
 def test_get_concept():
-    client = Client(base_url="https://entityfishing.kairntech.com/service")
+    client = Client(base_url="http://nerd.huma-num.fr/nerd//service")
     r = get_concept.sync_detailed(id="Q60772", client=client)
     result: Concept = r.parsed
     if r.is_success:
@@ -116,7 +104,7 @@ def test_get_concept():
 
 
 def test_get_conceptb_error():
-    client = Client(base_url="https://entityfishing.kairntech.com/service")
+    client = Client(base_url="http://nerd.huma-num.fr/nerd//service")
     r = get_concept.sync_detailed(id="XXXX", client=client)
     if r.is_success:
         pass
@@ -128,7 +116,7 @@ def test_get_conceptb_error():
 
 
 def test_term_lookup():
-    client = Client(base_url="https://entityfishing.kairntech.com/service")
+    client = Client(base_url="http://nerd.huma-num.fr/nerd//service")
     r = term_lookup.sync_detailed(term="Paris", lang="fr", client=client)
     result: TermSenses = r.parsed
     if r.is_success:
