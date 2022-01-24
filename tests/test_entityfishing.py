@@ -103,6 +103,15 @@ def test_get_concept():
         assert result.wikidata_id == "Q60772"
 
 
+def test_get_concept_wiki():
+    client = Client(base_url="http://nerd.huma-num.fr/nerd//service")
+    r = get_concept.sync_detailed(id="438549", lang="fr", client=client)
+    result: Concept = r.parsed
+    if r.is_success:
+        assert result is not None
+        assert result.raw_name == "Ursula von der Leyen"
+        assert result.wikidata_id == "Q60772"
+
 def test_get_conceptb_error():
     client = Client(base_url="http://nerd.huma-num.fr/nerd//service")
     r = get_concept.sync_detailed(id="XXXX", client=client)
